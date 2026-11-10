@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome Home, Douglas</title>
+  <!-- Keeps search engines away; only people with the link find it -->
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <!-- Share preview (kept general on purpose: this text is public) -->
+  <meta name="description" content="Sign up to help Douglas settle into his new home.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Welcome Home, Douglas">
+  <meta property="og:description" content="Sign up to help Douglas settle into his new home. From the TOLE community, with love.">
+  <meta property="og:image" content="https://tole-admin.github.io/care-douglas/preview.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://tole-admin.github.io/care-douglas/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&display=swap">
+  <!--
+    Welcome Home, Douglas — support sign-up page (GitHub version)
+    Lives at: https://tole-admin.github.io/care-douglas
+    PUBLIC FILE: no names, contacts or Douglas's list in here. The list comes
+    from the Google Apps Script, and only when the link carries the core code
+    after the # (…/care-douglas/#CODE). The # part never reaches GitHub.
+  -->
+  <style>
+    :root {
+      --navy: #1a1f55; --navy-deep: #10143f; --navy-glow: #2b2f73;
+      --copper: #c27b3a; --amber: #f0a54a; --gold: #ffd690;
+      --cream: #fff8ef; --ink: #2d2a3e; --muted: #6e6a84;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0 16px 48px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(ellipse at 50% 0, var(--navy-glow) 0, var(--navy) 420px) fixed, var(--navy);
+      color: var(--ink);
+    }
+    .wrap { max-width: 600px; margin: 0 auto; }
+    header { text-align: center; padding: 26px 0 6px; color: var(--cream); }
+    header svg { width: 96px; height: 96px; }
+    h1 { font-family: "EB Garamond", Georgia, serif; font-weight: 600; font-size: 32px; margin: 4px 0 6px; color: var(--gold); }
+    .intro { font-size: 16px; line-height: 1.55; color: #d9d6ee; max-width: 500px; margin: 0 auto 10px; }
+    .agreement {
+      font-size: 15px; line-height: 1.5; color: var(--gold); max-width: 500px; margin: 0 auto 22px;
+      border: 1px solid rgba(240,165,74,.45); border-radius: 14px; padding: 12px 14px;
+    }
+    .card { background: var(--cream); border-radius: 18px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 26px rgba(0,0,0,.25); }
+    h2 { font-family: "EB Garamond", Georgia, serif; font-weight: 600; font-size: 23px; color: var(--navy); margin: 0 0 4px; }
+    .sub { font-size: 14px; color: var(--muted); margin: 0 0 14px; }
+    .section { margin-bottom: 22px; }
+    .section:last-child { margin-bottom: 0; }
+    .section-name {
+      font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--copper); border-bottom: 1px solid #ecd9c4; padding-bottom: 6px; margin-bottom: 10px;
+    }
+    /* Each request is a real button: thumb-sized, works with a keyboard */
+    .item {
+      display: block; width: 100%; text-align: left; font: inherit; color: var(--ink);
+      background: #fff; border: 2px solid #ecd9c4; border-radius: 14px;
+      padding: 12px 14px 12px 46px; margin-bottom: 8px; min-height: 52px; cursor: pointer; position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .item::before {
+      content: ""; position: absolute; left: 14px; top: 14px; width: 20px; height: 20px;
+      border: 2px solid var(--copper); border-radius: 6px; background: #fff;
+    }
+    .item.selected { border-color: var(--copper); background: #fff3e4; }
+    .item.selected::before { background: var(--copper); box-shadow: inset 0 0 0 3px #fff3e4; }
+    .item:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+    .item .text { font-size: 16px; font-weight: 600; display: block; line-height: 1.3; }
+    .item .details { font-size: 14px; color: var(--muted); display: block; margin-top: 3px; line-height: 1.4; }
+    .item .names { font-size: 14px; color: var(--copper); display: block; margin-top: 5px; }
+    .item:disabled { background: #f2eee8; border-color: #e5ddd3; color: #9c95a8; cursor: default; }
+    .item:disabled::before { content: "✓"; border-color: #b9b2c4; color: #8a8398; font-size: 14px; line-height: 17px; text-align: center; }
+    .item:disabled .text { text-decoration: line-through; }
+    label.field { display: block; font-size: 14px; font-weight: 600; margin: 14px 0 6px; }
+    /* 16px text boxes so iPhones don't zoom in */
+    input[type=text], input[type=email], input[type=tel], textarea {
+      width: 100%; border: 2px solid #ecd9c4; border-radius: 12px; padding: 12px 13px;
+      font-size: 16px; font-family: inherit; color: var(--ink); background: #fff;
+    }
+    input:focus, textarea:focus { outline: none; border-color: var(--copper); }
+    textarea { min-height: 76px; resize: vertical; }
+    .choices { display: grid; gap: 8px; }
+    .choice {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px;
+      background: #fff; border: 2px solid #ecd9c4; border-radius: 12px; font-size: 16px; cursor: pointer;
+    }
+    .choice input { width: 20px; height: 20px; accent-color: var(--copper); margin: 0; }
+    .picked { font-size: 14px; color: var(--copper); margin: 4px 0 0; }
+    .btn {
+      width: 100%; margin-top: 20px; background: var(--copper); color: #fff; border: none; border-radius: 14px;
+      padding: 15px; min-height: 52px; font-size: 17px; font-weight: 700; font-family: inherit; cursor: pointer;
+      box-shadow: 0 6px 16px rgba(194,123,58,.35);
+    }
+    .btn:disabled { opacity: .6; cursor: default; }
+    .btn.small { width: auto; padding: 10px 18px; min-height: 44px; font-size: 15px; box-shadow: none; margin-top: 10px; }
+    .error { color: #a23a22; background: #fbe6dd; border-radius: 10px; padding: 10px 14px; font-size: 14px; margin-top: 14px; }
+    .loading { text-align: center; color: var(--muted); padding: 18px 0; }
+    #thanks { text-align: center; }
+    #thanks .big { font-size: 42px; }
+    #thanks p { font-size: 16px; line-height: 1.55; color: var(--ink); }
+    #thanks ul { text-align: left; display: inline-block; margin: 0 0 6px; padding-left: 20px; color: var(--copper); font-weight: 600; }
+    footer { text-align: center; font-size: 13px; color: #a7a4c9; margin-top: 26px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <!-- The SEED the TEMPLE fountain -->
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <defs><filter id="soft"><feGaussianBlur stdDeviation="4"/></filter></defs>
+        <g transform="translate(50 52) scale(1.25) translate(-50 -50)">
+          <circle cx="50" cy="44" r="28" fill="#f0a54a" opacity=".3" filter="url(#soft)"/>
+          <g fill="none" stroke="#ffd690" stroke-linecap="round">
+            <path d="M50 61 C48 47 52 37 50 28" stroke-width="2.2"/>
+            <path d="M50 37 C45 24 33 27 31 58" stroke-width="1.6"/>
+            <path d="M50 37 C55 24 67 27 69 58" stroke-width="1.6"/>
+            <path d="M50 44 C45 34 38 38 39 59" stroke-width="1.6"/>
+            <path d="M50 44 C55 34 62 38 61 59" stroke-width="1.6"/>
+          </g>
+          <path d="M27 59 C31 72 69 72 73 59 Z" fill="#10143f" stroke="#c27b3a" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M29 61.5 Q50 65 71 61.5" fill="none" stroke="#f0a54a" stroke-width="1"/>
+          <path d="M50 17 C54 22 54 27 50 28 C46 27 46 22 50 17 Z" fill="#fff6dd"/>
+        </g>
+      </svg>
+      <h1>Welcome Home, Douglas</h1>
+      <p class="intro">Douglas is settling into the house that will be home to him and to the Temple. Some of this is for this weekend, some is for the months ahead. Tap anything you'd like to help with, then add your details at the bottom.</p>
+      <p class="agreement">Douglas asks that every offer be clear: is it a gift, or what would you like in return? He's glad to cover costs and to compensate, and he values clear expectations on both sides.</p>
+    </header>
+
+    <!-- Shown when the link has no code, or the wrong one -->
+    <div class="card" id="noAccess" hidden>
+      <h2>This page opens from the link shared with the TOLE core</h2>
+      <p class="sub" style="margin:0">Please use the link from the core email. If you came from WhatsApp or another app and see this, tap ⋯ and choose "Open in browser."</p>
+    </div>
+
+    <div class="card" id="listCard">
+      <div id="loading" class="loading">Loading Douglas's list…</div>
+      <div id="loadError" hidden>
+        <p class="error" id="loadErrorMsg" style="margin-top:0"></p>
+        <button type="button" class="btn small" id="retryBtn">Try again</button>
+      </div>
+      <div id="sections"></div>
+    </div>
+
+    <form class="card" id="signupForm" hidden novalidate>
+      <h2>Your details</h2>
+      <p class="picked" id="pickedLine">Pick at least one item above.</p>
+
+      <label class="field" for="nameInput">Your name</label>
+      <input type="text" id="nameInput" autocomplete="name" placeholder="The name others know you by">
+
+      <label class="field" for="emailInput">Email</label>
+      <input type="email" id="emailInput" autocomplete="email" placeholder="you@example.com">
+
+      <label class="field" for="phoneInput">Phone</label>
+      <input type="tel" id="phoneInput" autocomplete="tel" placeholder="cell phone">
+
+      <label class="field" id="kindLabel">Is this a gift, or would you like something in return?</label>
+      <div class="choices" role="radiogroup" aria-labelledby="kindLabel">
+        <label class="choice"><input type="radio" name="kind" value="gift"> A gift</label>
+        <label class="choice"><input type="radio" name="kind" value="costs"> A gift of my time, but I'd like costs covered</label>
+        <label class="choice"><input type="radio" name="kind" value="exchange"> I'd like something in exchange</label>
+      </div>
+      <div id="detailsWrap" hidden>
+        <label class="field" for="detailsInput">What would you like in return?</label>
+        <input type="text" id="detailsInput" placeholder="e.g. cost of materials, $40/hr, a trade…">
+      </div>
+
+      <label class="field" for="noteInput">Anything else? (optional)</label>
+      <textarea id="noteInput" placeholder="e.g. I can do this Saturday after 2pm, I have a ladder…"></textarea>
+
+      <div class="error" id="errorMsg" role="alert" hidden></div>
+      <button type="submit" class="btn" id="submitBtn">Sign me up</button>
+    </form>
+
+    <div class="card" id="thanks" hidden>
+      <div class="big" aria-hidden="true">🏡</div>
+      <h2>Thank you</h2>
+      <p>You're down for:</p>
+      <ul id="thanksList"></ul>
+      <p>Next step: please reach out to <b>Douglas and Sonya</b> directly to set it up. Their contact details are in the confirmation email on its way to you now.</p>
+      <button type="button" class="btn small" id="againBtn">Sign up for something else</button>
+    </div>
+
+    <footer>From the TOLE community, with love.</footer>
+  </div>
+
+  <script>
+    // The Google Apps Script that holds Douglas's list and the Sign-Ups.
+    // Update the script with Manage deployments ▸ Edit ▸ New version, never "New deployment".
+    var SCRIPT_URL = 'PASTE_THE_WEB_APP_URL_HERE';
+
+    // The core code comes from the link after the #. It never reaches GitHub.
+    var KEY = decodeURIComponent((location.hash || '').replace(/^#/, '')).trim();
+    var selected = {};   // id -> request text
+
+    function $(id) { return document.getElementById(id); }
+
+    // Asks the script through its front door (no cookies, no Google sign-in).
+    function callScript(fn, args) {
+      var url = SCRIPT_URL + '?fn=' + encodeURIComponent(fn) +
+        '&args=' + encodeURIComponent(JSON.stringify([KEY].concat(args || [])));
+      return fetch(url, { method: 'GET', credentials: 'omit', redirect: 'follow' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('The server answered with an error (' + r.status + ').');
+          return r.json();
+        })
+        .then(function (res) {
+          if (!res || !res.ok) throw new Error((res && res.error) || 'Something went wrong.');
+          return res.data;
+        });
+    }
+
+    function showNoAccess() {
+      $('noAccess').hidden = false;
+      $('listCard').hidden = true;
+      $('signupForm').hidden = true;
+    }
+
+    function updatePicked() {
+      var picks = Object.keys(selected).map(function (k) { return selected[k]; });
+      $('pickedLine').textContent = picks.length
+        ? "You're picking " + picks.length + (picks.length === 1 ? ' item: ' : ' items: ') + picks.join('; ')
+        : 'Pick at least one item above.';
+    }
+
+    function render(data) {
+      $('loading').hidden = true;
+      $('loadError').hidden = true;
+      var wrap = $('sections');
+      wrap.innerHTML = '';
+      var sections = (data && data.sections) || [];
+      if (!sections.length) {
+        wrap.innerHTML = '<p class="sub">The list is empty right now. Check back soon.</p>';
+        return;
+      }
+      sections.forEach(function (sec) {
+        var box = document.createElement('div');
+        box.className = 'section';
+        var h = document.createElement('div');
+        h.className = 'section-name';
+        h.textContent = sec.name;
+        box.appendChild(h);
+
+        sec.items.forEach(function (it) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'item';
+          var t = document.createElement('span'); t.className = 'text'; t.textContent = it.text; b.appendChild(t);
+          if (it.details) { var d = document.createElement('span'); d.className = 'details'; d.textContent = it.details; b.appendChild(d); }
+          var n = document.createElement('span'); n.className = 'names';
+          n.textContent = it.done ? 'Done. Thank you!' : (it.names.length ? 'On it: ' + it.names.join(', ') : '');
+          if (n.textContent) b.appendChild(n);
+
+          if (it.done) {
+            b.disabled = true;
+            delete selected[it.id];
+          } else {
+            var on = !!selected[it.id];
+            b.classList.toggle('selected', on);
+            b.setAttribute('aria-pressed', String(on));
+            b.addEventListener('click', function () {
+              if (selected[it.id]) delete selected[it.id]; else selected[it.id] = it.text;
+              var now = !!selected[it.id];
+              b.classList.toggle('selected', now);
+              b.setAttribute('aria-pressed', String(now));
+              updatePicked();
+            });
+          }
+          box.appendChild(b);
+        });
+        wrap.appendChild(box);
+      });
+      $('signupForm').hidden = false;
+      updatePicked();
+    }
+
+    function load() {
+      $('loading').hidden = false;
+      $('loadError').hidden = true;
+      callScript('getBoard')
+        .then(render)
+        .catch(function (err) {
+          if (err.message === 'NO_ACCESS') { showNoAccess(); return; }
+          $('loading').hidden = true;
+          $('loadErrorMsg').textContent = "Couldn't load the list. Check your connection and try again. (" + err.message + ')';
+          $('loadError').hidden = false;
+        });
+    }
+
+    function showError(msg) { $('errorMsg').textContent = msg; $('errorMsg').hidden = false; }
+
+    function kindValue() {
+      var c = document.querySelector('input[name=kind]:checked');
+      return c ? c.value : '';
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('input[name=kind]'), function (r) {
+      r.addEventListener('change', function () { $('detailsWrap').hidden = kindValue() === 'gift'; });
+    });
+
+    $('retryBtn').addEventListener('click', load);
+    $('againBtn').addEventListener('click', function () {
+      selected = {};
+      $('thanks').hidden = true;
+      $('listCard').hidden = false;
+      load();
+      window.scrollTo(0, 0);
+    });
+
+    $('signupForm').addEventListener('submit', function (event) {
+      event.preventDefault();   // stay on this page
+      $('errorMsg').hidden = true;
+      var ids = Object.keys(selected);
+      var name = $('nameInput').value.trim();
+      var email = $('emailInput').value.trim();
+      var phone = $('phoneInput').value.trim();
+      var kind = kindValue();
+      var details = $('detailsInput').value.trim();
+
+      if (!ids.length) { showError('Pick at least one item above.'); return; }
+      if (!name) { showError('Please add your name.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Please add a valid email.'); return; }
+      if (!kind) { showError("Please say whether this is a gift or what you'd like in return."); return; }
+      if (kind !== 'gift' && !details) { showError("Please add a few words about what you'd like in return."); return; }
+
+      var btn = $('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      callScript('recordSignup', [{ name: name, email: email, phone: phone, kind: kind, details: details, note: $('noteInput').value.trim(), ids: ids }])
+        .then(function (res) {
+          btn.disabled = false;
+          btn.textContent = 'Sign me up';
+          if (!res || !res.ok) { showError((res && res.message) || 'Something went wrong. Please try again.'); load(); return; }
+          var ul = $('thanksList');
+          ul.innerHTML = '';
+          res.items.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+          $('listCard').hidden = true;
+          $('signupForm').hidden = true;
+          $('thanks').hidden = false;
+          $('noteInput').value = '';
+          window.scrollTo(0, 0);
+        })
+        .catch(function (err) {
+          btn.disabled = false;
+          btn.textContent = 'Sign me up';
+          if (err.message === 'NO_ACCESS') { showNoAccess(); return; }
+          showError("That didn't go through, so nothing was saved. Please try again. (" + err.message + ')');
+        });
+    });
+
+    if (!KEY) showNoAccess(); else load();
+  </script>
+</body>
+</html>
